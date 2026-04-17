@@ -8,7 +8,7 @@ let tray: Tray | null = null
 
 function createWindow(): void {
   mainWindow = new BrowserWindow({
-    width: 240,
+    width: 350,
     height: 80,
     frame: false,
     transparent: true,
@@ -89,10 +89,21 @@ function createTray(): void {
 app.whenReady().then(() => {
   if (process.platform === 'win32' && typeof app.setAppUserModelId === 'function') {
     app.setAppUserModelId('com.spotify.taskbar-widget')
+    
+    // Set the app to launch automatically on Windows startup
+    app.setLoginItemSettings({
+      openAtLogin: true,
+      path: app.getPath('exe')
+    })
   }
 
   createWindow()
   createTray()
+
+  // Show the window automatically once it's created
+  setTimeout(() => {
+    toggleWindow()
+  }, 1000)
 
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
