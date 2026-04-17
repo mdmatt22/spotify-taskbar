@@ -1,25 +1,21 @@
-import { app, BrowserWindow, ipcMain, Tray, Menu, screen } from 'electron'
+import { app, BrowserWindow, ipcMain, Tray, Menu, screen, nativeImage } from 'electron'
 import { join } from 'path'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-
+import { is } from '@electron-toolkit/utils'
 import { setupSpotify } from './spotify'
 
 let mainWindow: BrowserWindow | null = null
+let tray: Tray | null = null
 
 function createWindow(): void {
-  const { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().workAreaSize
-
   mainWindow = new BrowserWindow({
-    width: 400,
+    width: 240,
     height: 80,
-    x: screenWidth - 420,
-    y: screenHeight - 90,
     frame: false,
     transparent: true,
     alwaysOnTop: true,
     resizable: false,
     show: false,
-    // skipTaskbar: true, // Uncomment this to hide the widget from the Windows Taskbar (only use if Tray is enabled)
+    skipTaskbar: true,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
@@ -27,7 +23,6 @@ function createWindow(): void {
   })
 
   mainWindow.on('ready-to-show', () => {
-    mainWindow?.show()
     if (mainWindow) {
       setupSpotify(mainWindow)
     }
@@ -40,38 +35,64 @@ function createWindow(): void {
   }
 }
 
+function toggleWindow(): void {
+  if (!mainWindow) return
+
+  if (mainWindow.isVisible()) {
+    mainWindow.hide()
+  } else {
+    const { width: screenWidth, height: screenHeight, x: screenX, y: screenY } = screen.getPrimaryDisplay().workArea
+    const windowBounds = mainWindow.getBounds()
+    
+    // Position the window bottom-right, just 2px above/beside the work area boundaries
+    const x = screenX + screenWidth - windowBounds.width - 2
+    const y = screenY + screenHeight - windowBounds.height - 2
+    
+    mainWindow.setPosition(Math.round(x), Math.round(y))
+    mainWindow.show()
+    mainWindow.focus()
+  }
+}
+
 function createTray(): void {
-  tray = new Tray(join(__dirname, '../../resources/icon.png')) // Replace with real icon path
+  // Try to find the icon in multiple possible locations (dev and prod)
+  const iconName = 'Primary_Logo_Green_CMYK.svg'
+  const possiblePaths = [
+    join(__dirname, '../../', iconName),
+    join(process.cwd(), iconName)
+  ]
+  
+  let icon = nativeImage.createEmpty()
+  for (const p of possiblePaths) {
+    const img = nativeImage.createFromPath(p)
+    if (!img.isEmpty()) {
+      icon = img.resize({ width: 16, height: 16 })
+      break
+    }
+  }
+  
+  tray = new Tray(icon)
   const contextMenu = Menu.buildFromTemplate([
-    { label: 'Show Widget', click: () => mainWindow?.show() },
+    { label: 'Show Widget', click: () => toggleWindow() },
     { type: 'separator' },
     { label: 'Quit', click: () => app.quit() }
   ])
+  
   tray.setToolTip('Spotify Taskbar Widget')
   tray.setContextMenu(contextMenu)
+  
   tray.on('click', () => {
-    if (mainWindow?.isVisible()) {
-      mainWindow.hide()
-    } else {
-      mainWindow?.show()
-    }
+    toggleWindow()
   })
 }
 
 app.whenReady().then(() => {
-  // Set app ID for Windows taskbar grouping (optional)
   if (process.platform === 'win32' && typeof app.setAppUserModelId === 'function') {
     app.setAppUserModelId('com.spotify.taskbar-widget')
   }
 
-  app.on('browser-window-created', (_, window) => {
-    if (optimizer && typeof optimizer.watchWindowShortcuts === 'function') {
-      optimizer.watchWindowShortcuts(window)
-    }
-  })
-
   createWindow()
-  // createTray() // Temporarily disabled until icon is added
+  createTray()
 
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()

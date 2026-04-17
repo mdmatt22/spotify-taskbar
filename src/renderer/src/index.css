@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -10,63 +14,89 @@ body {
   height: 100vh;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: right;
 }
 
 .widget-container {
   display: flex;
   align-items: center;
-  background-color: rgba(24, 24, 24, 0.9);
+  background-color: rgba(24, 24, 24, 0.95);
   color: white;
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), 0 0 10px rgba(29, 185, 84, 0.1);
   user-select: none;
   -webkit-app-region: drag;
-  width: auto;
-  min-width: 300px;
+  width: 300px;
+  backdrop-filter: blur(8px);
 }
 
 .track-info {
   display: flex;
   align-items: center;
-  margin-right: 16px;
+  margin-right: 8px;
   flex: 1;
+  overflow: hidden;
 }
 
 .album-art {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: 4px;
-  margin-right: 12px;
+  margin-right: 8px;
+  flex-shrink: 0;
 }
 
 .text-container {
   display: flex;
   flex-direction: column;
-  max-width: 150px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.title, .artist {
+  white-space: nowrap;
 }
 
 .title {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: bold;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .artist {
-  font-size: 12px;
+  font-size: 11px;
   color: #b3b3b3;
-  white-space: nowrap;
+}
+
+.marquee-container {
+  width: 100%;
   overflow: hidden;
-  text-overflow: ellipsis;
+  position: relative;
+}
+
+.marquee-content {
+  display: flex;
+  width: max-content;
+}
+
+.marquee-content.scrolling {
+  animation: marquee-loop 10s linear infinite;
+}
+
+.marquee-spacer {
+  display: inline-block;
+  width: 40px;
+}
+
+@keyframes marquee-loop {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-50% - 20px)); }
 }
 
 .controls {
   display: flex;
-  gap: 8px;
+  gap: 4px;
   -webkit-app-region: no-drag;
 }
 
@@ -75,14 +105,24 @@ body {
   border: none;
   color: #1db954;
   cursor: pointer;
-  font-size: 14px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  filter: drop-shadow(0 0 2px rgba(29, 185, 84, 0.2));
 }
 
 .control-btn:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(29, 185, 84, 0.1);
+  transform: scale(1.1);
+  color: #1ed760;
+  filter: drop-shadow(0 0 5px rgba(29, 185, 84, 0.5));
+}
+
+.control-btn:active {
+  transform: scale(0.9);
 }
 
 .hide-btn {
