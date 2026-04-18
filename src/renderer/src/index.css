@@ -22,29 +22,28 @@ body {
   align-items: center;
   background-color: rgba(24, 24, 24, 0.95);
   color: white;
-  padding: 8px 12px;
+  padding: 8px 16px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), 0 0 10px rgba(29, 185, 84, 0.1);
   user-select: none;
   -webkit-app-region: drag;
-  width: 240px;
+  width: 300px;
   backdrop-filter: blur(8px);
 }
 
 .track-info {
   display: flex;
   align-items: center;
-  margin-right: 8px;
+  margin-right: 12px;
   flex: 1;
   overflow: hidden;
 }
 
 .album-art {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: 4px;
-  margin-right: 8px;
+  margin-right: 12px;
   flex-shrink: 0;
 }
 
@@ -60,12 +59,12 @@ body {
 }
 
 .title {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: bold;
 }
 
 .artist {
-  font-size: 11px;
+  font-size: 12px;
   color: #b3b3b3;
 }
 

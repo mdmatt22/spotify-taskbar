@@ -1,16 +1,21 @@
 import SpotifyWebApi from 'spotify-web-api-node'
-import { ipcMain, shell, BrowserWindow } from 'electron'
+import { ipcMain, shell, BrowserWindow, app } from 'electron'
+import { join } from 'path'
 import express from 'express'
-require('dotenv').config()
+
+// Handle .env in both development and production
+const isDev = !app.isPackaged
+const envPath = isDev ? join(__dirname, '../../.env') : join(process.resourcesPath, '.env')
+require('dotenv').config({ path: envPath })
 
 const Store = require('electron-store')
 const store = new (typeof Store === 'function' ? Store : Store.default)()
 const PORT = 8888
 const REDIRECT_URI = `http://127.0.0.1:${PORT}/callback`
 
-const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID
-const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET
-
+// Use a fallback mechanism to find credentials in both dev and prod
+const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID
+const CLIENT_SECRET = import.meta.env.VITE_SPOTIFY_CLIENT_SECRET
 const spotifyApi = new SpotifyWebApi({
   clientId: CLIENT_ID,
   clientSecret: CLIENT_SECRET,
@@ -24,6 +29,15 @@ const scopes = [
 ]
 
 export function setupSpotify(mainWindow: BrowserWindow): void {
+  if (!CLIENT_ID || !CLIENT_SECRET) {
+    const { dialog } = require('electron')
+    dialog.showErrorBox(
+      'Missing Spotify Credentials',
+      'SPOTIFY_CLIENT_ID or SPOTIFY_CLIENT_SECRET is missing from .env file. Please check your configuration.'
+    )
+    return
+  }
+
   const server = express()
 
   server.get('/callback', (req, res) => {

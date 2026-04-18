@@ -12,6 +12,26 @@
   "author": "",
   "license": "ISC",
   "description": "",
+  "build": {
+    "appId": "com.spotify.taskbar-widget",
+    "win": {
+      "target": "nsis",
+      "icon": "favicon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "Spotify Widget",
+      "installerIcon": "favicon.ico",
+      "uninstallerIcon": "favicon.ico",
+      "installerHeaderIcon": "favicon.ico"
+    },
+    "extraResources": [
+      ".env",
+      "Primary_Logo_Green_CMYK.svg",
+      "favicon.ico"
+    ]
+  },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",

@@ -7,9 +7,15 @@ let mainWindow: BrowserWindow | null = null
 let tray: Tray | null = null
 
 function createWindow(): void {
+  const iconName = 'Spotify_Icon_512.png'
+  const iconPath = app.isPackaged 
+    ? join(process.resourcesPath, iconName)
+    : join(__dirname, '../../', iconName)
+
   mainWindow = new BrowserWindow({
     width: 350,
     height: 80,
+    icon: nativeImage.createFromPath(iconPath),
     frame: false,
     transparent: true,
     alwaysOnTop: true,
@@ -55,10 +61,10 @@ function toggleWindow(): void {
 }
 
 function createTray(): void {
-  // Try to find the icon in multiple possible locations (dev and prod)
-  const iconName = 'Primary_Logo_Green_CMYK.svg'
+  const iconName = 'Spotify_Icon_512.png'
   const possiblePaths = [
     join(__dirname, '../../', iconName),
+    join(process.resourcesPath, iconName),
     join(process.cwd(), iconName)
   ]
   
